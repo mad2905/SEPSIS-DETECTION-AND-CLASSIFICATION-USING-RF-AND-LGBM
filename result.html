@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sepsis Risk Results</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa, #e4e8f0);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .result-container {
+            max-width: 800px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 40px;
+            text-align: center;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        .risk-indicator {
+            font-size: 24px;
+            margin: 30px 0;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .critical-risk {
+            background-color: #ffebee;
+            color: #c62828;
+            border-left: 5px solid #c62828;
+            animation: pulse 2s infinite;
+        }
+        .severe-risk {
+            background-color: #fff3e0;
+            color: #e65100;
+            border-left: 5px solid #e65100;
+        }
+        .sirs-risk {
+            background-color: #fffde7;
+            color: #f9a825;
+            border-left: 5px solid #f9a825;
+        }
+        .no-risk {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border-left: 5px solid #2e7d32;
+        }
+        .probability {
+            font-size: 48px;
+            font-weight: 700;
+            margin: 20px 0;
+        }
+        .high-prob {
+            color: #c62828;
+        }
+        .medium-prob {
+            color: #e65100;
+        }
+        .low-prob {
+            color: #2e7d32;
+        }
+        .metrics {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+        }
+        .metric {
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        .metric-label {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        .recommendation {
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+            text-align: left;
+        }
+        .critical-rec {
+            background: #ffebee;
+            border-left: 5px solid #c62828;
+        }
+        .severe-rec {
+            background: #fff3e0;
+            border-left: 5px solid #e65100;
+        }
+        .sirs-rec {
+            background: #fffde7;
+            border-left: 5px solid #f9a825;
+        }
+        .no-rec {
+            background: #e8f5e9;
+            border-left: 5px solid #2e7d32;
+        }
+        .back-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: all 0.3s;
+        }
+        .back-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+        .severity-scale {
+            display: flex;
+            margin: 20px 0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .scale-item {
+            flex: 1;
+            padding: 10px;
+            color: white;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="result-container">
+        <h1>Sepsis Risk Assessment Results</h1>
+        
+        <!--div class="probability 
+            {% if result['Classification'] == 'Critical Sepsis (Septic Shock)' %}high-prob
+            {% elif result['Classification'] == 'Severe Sepsis' %}medium-prob
+            {% else %}low-prob{% endif %}">
+            {{ (result['Probability Score'] * 100)|round(1) }}%
+        </div-->
+        
+        <div class="severity-scale">
+            <div class="scale-item" style="background: #2e7d32;">No Sepsis</div>
+            <div class="scale-item" style="background: #f9a825;">SIRS/Sepsis</div>
+            <div class="scale-item" style="background: #e65100;">Severe Sepsis</div>
+            <div class="scale-item" style="background: #c62828;">Critical</div>
+        </div>
+        
+        <div class="risk-indicator 
+            {% if result['Classification'] == 'Critical Sepsis (Septic Shock)' %}critical-risk
+            {% elif result['Classification'] == 'Severe Sepsis' %}severe-risk
+            {% elif result['Classification'] == 'SIRS/Sepsis' %}sirs-risk
+            {% else %}no-risk{% endif %}">
+            <h2>{{ result['Classification'] }}</h2>
+        </div>
+        
+        <div class="metrics">
+            <div class="metric">
+                <div class="metric-value">{{ (result['AUC-ROC'] * 100)|round(1) }}%</div>
+                <div class="metric-label">Model Accuracy</div>
+            </div>
+        </div>
+        
+        <div class="recommendation 
+            {% if result['Classification'] == 'Critical Sepsis (Septic Shock)' %}critical-rec
+            {% elif result['Classification'] == 'Severe Sepsis' %}severe-rec
+            {% elif result['Classification'] == 'SIRS/Sepsis' %}sirs-rec
+            {% else %}no-rec{% endif %}">
+            <h3>Clinical Recommendation:</h3>
+            
+            {% if result['Classification'] == 'Critical Sepsis (Septic Shock)' %}
+                <p><strong>EMERGENCY ACTION REQUIRED:</strong> This patient meets criteria for septic shock.</p>
+                <ul>
+                    <li>Immediate ICU transfer</li>
+                    <li>Initiate sepsis resuscitation bundle</li>
+                    <li>Vasopressors for hypotension</li>
+                    <li>Broad-spectrum antibiotics within 1 hour</li>
+                    <li>Fluid resuscitation</li>
+                    <li>Central venous and arterial line placement</li>
+                    <li>Frequent lactate monitoring</li>
+                </ul>
+                
+            {% elif result['Classification'] == 'Severe Sepsis' %}
+                <p><strong>URGENT ACTION NEEDED:</strong> This patient shows signs of organ dysfunction.</p>
+                <ul>
+                    <li>Initiate sepsis protocol immediately</li>
+                    <li>Blood cultures before antibiotics</li>
+                    <li>IV antibiotics within 3 hours</li>
+                    <li>30mL/kg crystalloid for hypotension/lactate ≥4</li>
+                    <li>Measure serum lactate</li>
+                    <li>Consider ICU admission</li>
+                </ul>
+                
+            {% elif result['Classification'] == 'SIRS/Sepsis' %}
+                <p><strong>Warning:</strong> This patient meets SIRS criteria but no organ dysfunction detected.</p>
+                <ul>
+                    <li>Close monitoring (q1-2h vitals)</li>
+                    <li>Consider sepsis workup</li>
+                    <li>Repeat assessment in 2-4 hours</li>
+                    <li>Consider early antibiotic therapy if infection suspected</li>
+                    <li>Monitor for signs of organ dysfunction</li>
+                </ul>
+                
+            {% else %}
+                <p><strong>No sepsis detected:</strong> Patient does not currently meet SIRS criteria.</p>
+                <ul>
+                    <li>Routine monitoring</li>
+                    <li>Reassess if clinical condition changes</li>
+                    <li>Consider alternative diagnoses</li>
+                    <li>Maintain vigilance for developing symptoms</li>
+                </ul>
+            {% endif %}
+        </div>
+        
+        <button class="back-btn" onclick="window.location.href='/'">Assess Another Patient</button>
+    </div>
+</body>
+</html>
